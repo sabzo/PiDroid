@@ -9,10 +9,29 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Take photo"
+        android:id="@+id/btnPhoto"
+        android:padding="10dp"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnPhoto"
+        android:layout_below="@+id/btnPhoto"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:id="@+id/ivPreview"/>
+
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@+id/ivPreview"
+        android:layout_below="@+id/ivPreview"
         android:id="@+id/lvDevices"/>
 
 </RelativeLayout>
