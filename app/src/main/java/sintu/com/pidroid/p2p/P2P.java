@@ -24,7 +24,7 @@ public class P2P {
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
     private Handler peerHandler;
-    private WifiP2pManager.ConnectionInfoListener connectionInfoListener;
+    private String currentDeviceAddress;
 
     private void createIntent() {
         intentFilter = new IntentFilter();
@@ -86,7 +86,7 @@ public class P2P {
     }
 
 
-    public void connect(WifiP2pDevice device) {
+    public void connect(final WifiP2pDevice device) {
         // Picking the first device found on the network.
 
         WifiP2pConfig config = new WifiP2pConfig();
@@ -97,7 +97,9 @@ public class P2P {
 
             @Override
             public void onSuccess() {
-                // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                // The process to connect (not actual connection result)
+                // TODO Create Receiver to store device address for now assume connect works
+                currentDeviceAddress = device.deviceAddress;
             }
 
             @Override
@@ -106,5 +108,9 @@ public class P2P {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public String getCurrentDeviceAddress() {
+        return currentDeviceAddress;
     }
 }

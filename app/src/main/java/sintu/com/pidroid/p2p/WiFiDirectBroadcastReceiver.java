@@ -48,6 +48,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 // InetAddress from WifiP2pInfo struct.
                 InetAddress groupOwnerAddress = info.groupOwnerAddress;
+                String k = info.groupOwnerAddress.toString();
 
                 if (info.groupFormed && info.isGroupOwner) {
                     Log.d("Debug", "I'm GO, which shouldn't be the case");
@@ -65,6 +66,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             // Check to see if Wi-Fi is enabled and notify appropriate activity
+            int state = (int) intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, 1);
+            if (state == WifiP2pManager.WIFI_P2P_STATE_DISABLED) {
+                Log.d("Debug", "Unable to send image to RPi, P2P disabled");
+            }
 
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             // Call WifiP2pManager.requestPeers() to get a list of current peers
