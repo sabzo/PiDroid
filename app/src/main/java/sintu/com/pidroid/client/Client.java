@@ -1,5 +1,7 @@
 package sintu.com.pidroid.client;
 
+import java.io.BufferedReader;
+
 import android.graphics.Bitmap;
 
 import android.os.Handler;
@@ -12,16 +14,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+
 import java.net.Socket;
 
 /**
  * Client
  */
 public class Client {
+
     private BufferedReader in;
     private Socket socket;
     private Handler uiHandler;
     private OutputStream out;
+
 
     public Client(String serverAddress, int port, Handler uiHandler) {
         Log.d("client_debug", "Connecting as a client");
@@ -31,6 +36,7 @@ public class Client {
             out = socket.getOutputStream();
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
+
             String message = in.readLine();
 
             Message m = Message.obtain();
@@ -52,6 +58,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 }

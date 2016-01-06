@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler peerHandler;
     private Handler uiHandler;
 
+
     private static final int ACCESS_STORAGE_PERMISSION = 1000;
     public static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final String APP_TAG = "SANKOFA";
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Client client;
     public static final int PORT = 9023;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 // Load the taken image into a preview
                 ImageView ivPreview = (ImageView) findViewById(R.id.ivPreview);
                 ivPreview.setImageBitmap(takenImage);
+
                 // (Make sure to have first connected) then Send image here TODO MOVE THIS ELSEWHERE
                 sendImage();
             } else { // Result was a failure
@@ -239,4 +242,5 @@ public class MainActivity extends AppCompatActivity {
             client.sendImage(bitmap);
         }
     }
+
 }
