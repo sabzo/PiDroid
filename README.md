@@ -9,12 +9,17 @@ This project is an extension of Public Payphone [http://leimertphonecompany.net]
 and upload pictures to Twitter. The Pi currently listens to dialpad presses and uses these to trigger the above activities.
 Part of the GPIO dialpad code is at [https://github.com/sabzo/piphone-cam/blob/master/tommyCam.py]
 
-This latest code is part of a 
+This project can utilize two different types of WiFi connection methods: Infrastructure and WifiDirect.
+Infrastructure is the traditional WiFi access point. WiFi direct connects without using an AccessPoint.
 
 ## User Stories
-
-* [x] Raspberry Pi (Pi) creates Access Point and acts as a Group Owner
-* [x] Android detects nearby Pi displays connection name on Screen
+* `Infrastructure`
+* [x] Raspberry Pi (Pi) creates 'infrastructure' Access Point and broadcasts Access Point
+* [x] Pi creates a Web Server (Flask in this case) and serves media to connected devices (mobile/desktop)
+* [x] Pi saves user content in SQLite DB
+* `Wifi Direct`
+* [x] Raspberry Pi (Pi) advertises itself as P2P enabled and specifically requests to be a Group Owner upon connection.
+* [x] Android app detects nearby Pi displays connection name on Screen
 * [x] Android triggers connection by a Click event, pbc (PBC). This ensures no specific key code is needed
 * [ ] Android takes pictures and stores them on Pi
 * [ ] Android can stream pictures and video from raspberry pi
