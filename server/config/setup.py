@@ -3,20 +3,29 @@ class Nobu:
     def __init__(self, ssid, password):
         self.ssid = ssid
         self.password = password
-        self.create_hostapd_conf()
-        self.create_dhcpd_conf()
-        self.create_interfaces_conf()
+        # Get the configuration settings (text)
+        hostapd_conf = self.create_hostapd_conf()
+        interfaces_conf = self.create_interfaces_conf()
+        dhcpd_conf = self.create_dhcpd_conf()
+        # create the necessary linux commands to create an AccessPoint
+        hostapd_cmd = 'sudo hostapd /etc/hostapd/hostapd.conf'
+        interace_cmd = ['sudo ifdown wlan0','sudo ifconfig wlan0 192.168.42.1', 'sudo ifup wlan0']
+        dhcpd_cmd = 'sudo dhcpd -cf /etc/dhcp/dhcpd.conf'
+        conf_files = [('hostapd.conf.ap', hostapd_conf, hostapd_cmd), \
+            ('interfaces.ap', interfaces_conf, interace_cmd ), \
+            ('dhcpd.conf.ap', dhcpd_conf, dhcpd_cmd)]
         # write conf files to disk. Location is current directory '.'
-        conf_files = [('hostapd.conf.ap', self.hostapd_conf), ('dhcpd.conf.ap', self.dhcpd_conf), ('interfaces.ap', self.interfaces_conf)]
         for conf in conf_files:
           self.create_conf_file(conf[0], conf[1]) # 0 = filename, 1 = configuration text
+          self.run_command(conf[2]) # 2 is the command in the tuple `conf`
 
+    # Write the configuration file to disk
     def create_conf_file(self, filename, text):
         f = open(filename, 'w')
         f.write(text)
-
+    # Returns the hostapd configuration text
     def create_hostapd_conf(self):
-        self.hostapd_conf = """# Basic configuration
+        hostapd_conf = """# Basic configuration
 interface=wlan0
 ssid=%s
 channel=1
@@ -37,9 +46,10 @@ ieee80211n=1
 hw_mode=g
 device_name=RTL8192CU
 manufacturer=Realtek""" % (self.ssid, self.password)
-
+    return hostapd_conf
+    # returns the dhcpd configuration text
     def create_dhcpd_conf(self):
-        self.dhcpd_conf = """# The ddns-updates-style parameter controls whether or not the server will
+        dhcpd_conf = """# The ddns-updates-style parameter controls whether or not the server will
 # attempt to do a DNS update when a lease is confirmed. We default to the
 # behavior of the version 2 packages ('none', since DHCP v2 didn't
 # have support for DDNS.)
@@ -66,20 +76,21 @@ subnet 192.168.42.0 netmask 255.255.255.0 {
   option domain-name-servers 8.8.8.8, 8.8.4.4;
 }
 """
-
+    return dhcpd_conf
+    # returns the interfaces configuration text
     def create_interfaces_conf(self):
-        self.interfaces_conf = """auto lo
-
+        interfaces_conf = """auto lo
 iface lo inet loopback
 iface eth0 inet dhcp
-
 allow-hotplug wlan0
-
 iface wlan0 inet static
   address 192.168.42.1
   netmask 255.255.255.0
 """
-    def stdout(self, args):
-        cmd = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE)
+    return interfaces_conf
+    
+    # helper function to write linux commands
+    def run_command(self, args):
+        cmd = subprocess.Popen(args, shell=isinstance(args, basestring), stdout=subprocess.PIPE)
         (stdoutdata, stderrdata) = cmd.communicate()
         return stdoutdata
