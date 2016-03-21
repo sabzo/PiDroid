@@ -5,20 +5,9 @@ class Nobu:
         self.ssid = ssid
         self.password = password
         # Get the configuration settings (text)
-        hostapd_conf = self.create_hostapd_conf()
-        interfaces_conf = self.create_interfaces_conf()
-        dhcpd_conf = self.create_dhcpd_conf()
-        # create the necessary linux commands to create an AccessPoint
-        hostapd_cmd = 'sudo hostapd hostapd.conf.ap &' # run as daemon
-        interface_cmd = ['sudo ifdown wlan0','sudo ifconfig wlan0 192.168.42.1', 'sudo ifup wlan0']
-        dhcpd_cmd = 'sudo dhcpd -cf dhcpd.conf.ap'
-        conf_files = [('hostapd.conf.ap', hostapd_conf, hostapd_cmd), \
-            ('interfaces.ap', interfaces_conf, interface_cmd ), \
-            ('dhcpd.conf.ap', dhcpd_conf, dhcpd_cmd)]
-        # write conf files to disk. Location is current directory '.'
-        for conf in conf_files:
-          self.create_conf_file(conf[0], conf[1]) # 0 = filename, 1 = configuration text
-          self.run_command(conf[2]) # 2 is the command in the tuple `conf`
+        self.create_interfaces_conf()
+        self.create_dhcpd_conf()
+        self.create_hostapd_conf()
 
     # Write the configuration file to disk
     def create_conf_file(self, filename, text):
@@ -48,7 +37,9 @@ class Nobu:
             hw_mode=g
             device_name=RTL8192CU
             manufacturer=Realtek""") % (self.ssid, self.password)
-        return hostapd_conf
+        self.create_conf_file('hostapd.conf.ap', hostapd_conf)
+        self.run_command(['sudo', 'hostapd', 'hostapd.conf.ap'])
+
     # returns the dhcpd configuration text
     def create_dhcpd_conf(self):
         dhcpd_conf = textwrap.dedent("""\
@@ -79,7 +70,10 @@ class Nobu:
               option domain-name-servers 8.8.8.8, 8.8.4.4;
             }
             """)
-        return dhcpd_conf
+        self.create_conf_file('dhcpd.conf.ap', dhcpd_conf)
+        self.run_command(['sudo', 'service', 'isc-dhcp-server', 'stop'])
+        self.run_command(['sudo', 'dhcpd', '-cf', 'dhcpd.conf.ap'])
+
     # returns the interfaces configuration text
     def create_interfaces_conf(self):
         interfaces_conf = textwrap.dedent("""\
@@ -91,10 +85,13 @@ class Nobu:
               address 192.168.42.1
               netmask 255.255.255.0
             """)
-        return interfaces_conf
+        self.create_conf_file('interfaces.ap', interfaces_conf)
+        self.run_command(['sudo', 'ifdown', 'wlan0']) # turn off wifi for now
+        self.run_command(['sudo', 'ifconfig', 'wlan0', '192.168.42.1']) # set wifi ip
+        self.run_command(['sudo', 'ifup', 'wlan0']) # turn back wifi
     # helper function to write linux commands
     def run_command(self, args):
         print(args)
-        cmd = subprocess.Popen(args, shell=isinstance(args, basestring), stdout=subprocess.PIPE)
+        cmd = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE)
         (stdoutdata, stderrdata) = cmd.communicate()
         return stdoutdata
