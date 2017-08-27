@@ -23,7 +23,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>I had found that basically feeding what xrandr output back into itself would sometimes fix it until the next reboot. So I kept digging. Eventually, I found that clarifying some of the parameters in the xorg.conf file would fix it. But the setup was still a bit temperamental.
+        </activity>
 
 
     </application>
